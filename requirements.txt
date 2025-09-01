@@ -1,0 +1,44 @@
+# NYC Taxi Data Ingestion Pipeline Requirements
+
+# Core Data Processing
+pandas>=2.0.0
+pyarrow>=12.0.0
+numpy>=1.24.0
+
+# Snowflake Integration
+snowflake-connector-python>=3.7.0
+
+# AWS S3 Integration
+boto3>=1.26.0
+botocore>=1.29.0
+
+# HTTP Requests
+requests>=2.28.0
+urllib3>=1.26.0
+
+# Configuration Management
+python-dotenv>=1.0.0
+
+# Logging and Monitoring
+structlog>=23.0.0
+
+# Type Hints and Validation
+typing-extensions>=4.5.0
+
+# Development and Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# Documentation
+sphinx>=6.0.0
+sphinx-rtd-theme>=1.2.0
+
+# Container Support
+gunicorn>=20.1.0
+
+# Performance
+psutil>=5.9.0
