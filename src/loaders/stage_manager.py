@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from botocore.exceptions import ClientError, NoCredentialsError
 import snowflake.connector
+import pandas as pd
 
 from src.config.settings import SnowflakeConfig, S3Config
 from src.utils.logger import get_logger

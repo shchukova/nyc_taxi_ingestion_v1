@@ -21,16 +21,33 @@ Usage Examples:
 
 import argparse
 import sys
+import os
 from pathlib import Path
 from datetime import datetime
 import json
 
-# Add src directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add src directory to Python path
+current_dir = Path(__file__).parent
 
-from src.orchestrator.ingestion_pipeline import IngestionPipeline
-from src.utils.logger import setup_pipeline_logging, get_logger
-from src.utils.exceptions import PipelineError, ConfigurationError
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
+
+# Set PYTHONPATH environment variable as backup
+os.environ['PYTHONPATH'] = str(project_root)
+
+try:
+    from src.orchestrator.ingestion_pipeline import IngestionPipeline
+    from src.utils.logger import setup_pipeline_logging, get_logger
+    from src.utils.exceptions import PipelineError, ConfigurationError
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Python path: {sys.path}")
+    print(f"Current directory: {os.getcwd()}")
+    print(f"Project root: {project_root}")
+    print("\nPlease ensure you're running from the project root directory:")
+    print("cd /var/www/nyc_taxi_ingestion")
+    print("python scripts/run_ingestion.py ...")
+    sys.exit(1)
 
 
 def parse_arguments():

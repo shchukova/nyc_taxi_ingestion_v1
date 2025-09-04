@@ -1,4 +1,3 @@
- src/config/settings.py
 """
 Configuration management for NYC Taxi Data Ingestion Pipeline
 """
