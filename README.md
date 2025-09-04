@@ -220,3 +220,5 @@ This pipeline processes NYC TLC trip record data:
 - [ ] Real-time streaming ingestion
 - [ ] Data quality monitoring dashboard
 - [ ] Integration with dbt for transformations
+
+- [ ] Integration with dbt 
