@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import random
 
 from src.config.settings import TLCConfig
 from src.data_sources.tlc_data_source import TLCDataFile
@@ -87,11 +88,13 @@ class FileExtractor:
         return session
     
     def download_file(
-        self, 
-        data_file: TLCDataFile, 
+        self,
+        data_file: TLCDataFile,
         force_redownload: bool = False,
-        show_progress: bool = True
-    ) -> Path:
+        show_progress: bool = True,
+        max_retries: int = 3,
+        retry_delay: float = 1.0
+        ) -> Path:
         """
         Download a TLC data file
         
@@ -99,6 +102,8 @@ class FileExtractor:
             data_file: TLC data file information
             force_redownload: Force redownload even if file exists
             show_progress: Whether to show download progress
+            max_retries: Maximum number of retry attempts
+            retry_delay: Base delay between retries (with exponential backoff)
             
         Returns:
             Path to the downloaded file
@@ -107,7 +112,7 @@ class FileExtractor:
             ExtractionError: If download fails after all retries
         """
         local_path = self.data_dir / data_file.filename
-        
+
         # Check if file already exists and is valid
         if local_path.exists() and not force_redownload:
             if self._validate_file_integrity(local_path, data_file):
@@ -115,25 +120,42 @@ class FileExtractor:
                 return local_path
             else:
                 self.logger.warning(f"Existing file is corrupted, re-downloading: {local_path}")
-        
+
         self.logger.info(f"Starting download: {data_file.url}")
-        
-        try:
-            self._download_with_progress(data_file.url, local_path, show_progress)
+    
+        last_exception = None
+    
+        for attempt in range(max_retries + 1):
+            try:
+                self._download_with_progress(data_file.url, local_path, show_progress)
+
+                # Validate downloaded file
+                if not self._validate_file_integrity(local_path, data_file):
+                    raise ExtractionError(f"Downloaded file failed integrity check: {local_path}")
+
+                self.logger.info(f"Successfully downloaded: {local_path}")
+                return local_path
+
+            except Exception as e:
+                last_exception = e
             
-            # Validate downloaded file
-            if not self._validate_file_integrity(local_path, data_file):
-                raise ExtractionError(f"Downloaded file failed integrity check: {local_path}")
+                # Clean up partial download
+                if local_path.exists():
+                    local_path.unlink()
             
-            self.logger.info(f"Successfully downloaded: {local_path}")
-            return local_path
-            
-        except Exception as e:
-            # Clean up partial download
-            if local_path.exists():
-                local_path.unlink()
-            
-            raise ExtractionError(f"Failed to download {data_file.url}: {str(e)}") from e
+                if attempt < max_retries:
+                    # Calculate delay with exponential backoff and jitter
+                    delay = retry_delay * (2 ** attempt) + random.uniform(0, 1)
+                    self.logger.warning(
+                        f"Download attempt {attempt + 1} failed for {data_file.url}: {str(e)}. "
+                        f"Retrying in {delay:.1f} seconds..."
+                    )
+                    time.sleep(delay)
+                else:
+                    self.logger.error(f"All {max_retries + 1} download attempts failed for {data_file.url}")
+
+        # If we get here, all retries failed
+        raise ExtractionError(f"Failed to download {data_file.url} after {max_retries + 1} attempts: {str(last_exception)}") from last_exception
     
     def _download_with_progress(
         self, 
