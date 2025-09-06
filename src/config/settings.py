@@ -86,12 +86,6 @@ class PipelineConfig:
 class Settings:
     """
     Main settings class that aggregates all configuration
-    
-    This class follows the configuration management best practices:
-    - Environment-based configuration
-    - Type safety with dataclasses
-    - Default values for development
-    - Clear separation of concerns
     """
     
     def __init__(self):
