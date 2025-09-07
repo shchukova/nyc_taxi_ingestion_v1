@@ -13,6 +13,7 @@ import os
 
 from src.loaders.snowflake_loader import SnowflakeLoader
 from src.utils.exceptions import LoaderError
+from src.models.tlc_data_file import TLCDataFile
 
 
 class TestSnowflakeLoaderBatchProcessing:

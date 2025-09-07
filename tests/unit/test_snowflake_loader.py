@@ -610,8 +610,8 @@ class TestSnowflakeLoaderSchemas:
 class TestSnowflakeLoaderIntegration:
     """Integration-style tests for SnowflakeLoader"""
     
-    @patch('loaders.snowflake_loader.snowflake.connector.connect')
-    @patch('loaders.snowflake_loader.write_pandas')
+    @patch('snowflake.connector.connect')
+    @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_full_load_workflow(self, mock_read_parquet, mock_write_pandas, 
                                 mock_connect, loader, sample_data_file, sample_dataframe):
@@ -624,6 +624,15 @@ class TestSnowflakeLoaderIntegration:
         mock_cursor = Mock()
         mock_connection.cursor.return_value = mock_cursor
         mock_connect.return_value = mock_connection
+
+        data_file = TLCDataFile(
+            trip_type="yellow_tripdata",
+            year=2024,
+            month=1,
+            url="https://example.com/test.parquet",
+            filename=sample_data_file,  # This is what the method needs
+            estimated_size_mb=10
+        )
         
         # Create a temporary file
         with tempfile.NamedTemporaryFile(suffix='.parquet', delete=False) as temp_file:
@@ -635,7 +644,7 @@ class TestSnowflakeLoaderIntegration:
             assert table_created is True
             
             # Load data
-            result = loader.load_parquet_file(temp_path, "test_table", sample_data_file)
+            result = loader.load_parquet_file(temp_path, "test_table", data_file)
             
             assert result["status"] == "completed"
             assert result["loaded_records"] == 3
