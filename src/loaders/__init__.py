@@ -1,5 +1,4 @@
-"""Data extraction components"""
+# src/loaders/__init__.py
+from .snowflake_loader import SnowflakeLoader
 
-from .file_extractor import FileExtractor
-
-__all__ = ['FileExtractor']
+__all__ = ['SnowflakeLoader']
