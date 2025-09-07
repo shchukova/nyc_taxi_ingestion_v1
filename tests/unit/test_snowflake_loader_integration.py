@@ -18,7 +18,7 @@ from src.utils.exceptions import LoaderError
 class TestSnowflakeLoaderBatchProcessing:
     """Test batch processing capabilities"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_large_file_batch_processing(self, mock_read_parquet, mock_write_pandas, 
@@ -49,7 +49,7 @@ class TestSnowflakeLoaderBatchProcessing:
         finally:
             os.unlink(temp_path)
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_batch_processing_with_failures(self, mock_read_parquet, mock_write_pandas, 
@@ -94,7 +94,7 @@ class TestSnowflakeLoaderBatchProcessing:
 class TestSnowflakeLoaderMetadataHandling:
     """Test metadata and lineage tracking"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_metadata_columns_added(self, mock_read_parquet, mock_write_pandas, 
@@ -132,7 +132,7 @@ class TestSnowflakeLoaderMetadataHandling:
         finally:
             os.unlink(temp_path)
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_record_hash_consistency(self, mock_read_parquet, mock_write_pandas, 
@@ -177,7 +177,7 @@ class TestSnowflakeLoaderMetadataHandling:
 class TestSnowflakeLoaderDifferentTripTypes:
     """Test handling of different trip types"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     def test_create_yellow_vs_green_tables(self, mock_connect, loader):
         """Test that different schemas are created for different trip types"""
         mock_connection = Mock()
@@ -204,7 +204,7 @@ class TestSnowflakeLoaderDifferentTripTypes:
         assert "trip_type INTEGER" in green_sql
         assert "trip_type INTEGER" not in yellow_sql
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_load_green_taxi_data(self, mock_read_parquet, mock_write_pandas, 
@@ -236,7 +236,7 @@ class TestSnowflakeLoaderDifferentTripTypes:
 class TestSnowflakeLoaderErrorRecovery:
     """Test error recovery and rollback scenarios"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('pandas.read_parquet')
     def test_connection_failure_during_load(self, mock_read_parquet, mock_connect, 
                                             loader, sample_data_file, sample_dataframe):
@@ -259,7 +259,7 @@ class TestSnowflakeLoaderErrorRecovery:
         finally:
             os.unlink(temp_path)
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_data_quality_failure_prevents_load(self, mock_read_parquet, mock_write_pandas, 
@@ -287,7 +287,7 @@ class TestSnowflakeLoaderErrorRecovery:
 class TestSnowflakeLoaderPerformanceFeatures:
     """Test performance-related features"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_parallel_loading_configuration(self, mock_read_parquet, mock_write_pandas, 
@@ -314,7 +314,7 @@ class TestSnowflakeLoaderPerformanceFeatures:
         finally:
             os.unlink(temp_path)
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_load_statistics_tracking(self, mock_read_parquet, mock_write_pandas, 
@@ -352,7 +352,7 @@ class TestSnowflakeLoaderPerformanceFeatures:
 class TestSnowflakeLoaderQueryOperations:
     """Test query execution and table information operations"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     def test_table_info_with_real_data(self, mock_connect, loader):
         """Test getting table information with realistic data"""
         mock_connection = Mock()
@@ -377,7 +377,7 @@ class TestSnowflakeLoaderQueryOperations:
         assert result["last_load"] == '2024-01-31 23:59:59'
         assert result["unique_files"] == 31
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     def test_execute_complex_query(self, mock_connect, loader):
         """Test executing complex analytical queries"""
         mock_connection = Mock()
@@ -418,7 +418,7 @@ class TestSnowflakeLoaderQueryOperations:
 class TestSnowflakeLoaderEndToEnd:
     """End-to-end integration tests"""
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_complete_workflow_yellow_taxi(self, mock_read_parquet, mock_write_pandas, 
@@ -460,7 +460,7 @@ class TestSnowflakeLoaderEndToEnd:
         finally:
             os.unlink(temp_path)
     
-    @patch('src.loaders.snowflake_loader.snowflake.connector.connect')
+    @patch('snowflake.connector.connect')
     @patch('src.loaders.snowflake_loader.write_pandas')
     @patch('pandas.read_parquet')
     def test_multi_file_loading_simulation(self, mock_read_parquet, mock_write_pandas, 
