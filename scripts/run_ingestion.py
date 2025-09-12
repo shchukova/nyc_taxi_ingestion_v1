@@ -25,6 +25,9 @@ import os
 from pathlib import Path
 from datetime import datetime
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Add src directory to Python path
 current_dir = Path(__file__).parent
@@ -335,7 +338,7 @@ def main():
         
         logger.info("Starting NYC Taxi Data Ingestion Pipeline")
         logger.info(f"Arguments: {vars(args)}")
-        
+    
         # Handle utility operations first
         if args.validate_config:
             from src.config.settings import settings
