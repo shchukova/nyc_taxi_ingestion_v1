@@ -261,12 +261,16 @@ class StageManager:
             file_path += f"/{file_pattern}"
         
         copy_sql = f"""
-        COPY INTO {table_name}
-        FROM {file_path}
-        FILE_FORMAT = (TYPE = 'PARQUET' COMPRESSION = 'AUTO')
-        ON_ERROR = 'CONTINUE'
-        PURGE = FALSE
-        """
+            COPY INTO {table_name}
+            FROM {file_path}
+            FILE_FORMAT = (
+                TYPE = 'PARQUET' 
+                COMPRESSION = 'AUTO'
+            )
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            ON_ERROR = 'CONTINUE'
+            PURGE = FALSE
+            """
         
         try:
             with self._get_snowflake_connection() as conn:
@@ -289,12 +293,14 @@ class StageManager:
                 for row in results:
                     if len(row) >= 3:  # Standard COPY INTO result format
                         stats['files_loaded'] += 1
-                        stats['rows_loaded'] += row[1] if row[1] else 0
+                        rows_loaded = int(row[1]) if row[1] and str(row[1]).isdigit() else 0
+                        stats['rows_loaded'] += rows_loaded
                         if row[2]:  # Error count
-                            stats['errors_seen'] += row[2]
+                            error_count = int(row[2]) if str(row[2]).isdigit() else 0
+                            stats['errors_seen'] += error_count
                             if row[3] and not stats['first_error']:  # First error message
                                 stats['first_error'] = row[3]
-                            stats['files_with_errors'].append(row[0])
+                            stats['files_with_errors'].append(str(row[0]))
                 
                 self.logger.info(
                     f"Copy operation completed: {stats['files_loaded']} files, "
